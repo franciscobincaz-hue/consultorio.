@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Consultorio">
+<meta name="theme-color" content="#ffffff">
+<title>Consultorio · Psicología</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<style>
+  :root {
+    --teal: #1D9E75;
+    --teal-light: #E1F5EE;
+    --teal-mid: #5DCAA5;
+    --teal-dark: #0F6E56;
+    --red: #A32D2D;
+    --red-light: #FCEBEB;
+    --blue: #185FA5;
+    --blue-light: #E6F1FB;
+    --amber: #BA7517;
+    --amber-light: #FAEEDA;
+    --gray-50: #F8F8F7;
+    --gray-100: #F1EFE8;
+    --gray-200: #D3D1C7;
+    --gray-400: #888780;
+    --gray-600: #5F5E5A;
+    --gray-900: #1C1C1A;
+    --radius-sm: 8px;
+    --radius-md: 12px;
+    --radius-lg: 16px;
+    --radius-xl: 20px;
+    --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
+    --shadow-md: 0 4px 16px rgba(0,0,0,0.10);
+    --font: -apple-system, 'SF Pro Text', 'Helvetica Neue', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  html, body { height: 100%; overflow: hidden; background: var(--gray-50); font-family: var(--font); color: var(--gray-900); }
+
+  /* ── Layout ── */
+  #app { display: flex; flex-direction: column; height: 100dvh; max-width: 430px; margin: 0 auto; background: #fff; position: relative; box-shadow: var(--shadow-md); }
+
+  /* ── Header ── */
+  .header { padding: 52px 20px 14px; background: #fff; border-bottom: 1px solid var(--gray-100); flex-shrink: 0; }
+  .header-row { display: flex; align-items: center; justify-content: space-between; }
+  .header h1 { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; color: var(--gray-900); }
+  .header p { font-size: 13px; color: var(--gray-400); margin-top: 1px; }
+  .header-actions { display: flex; gap: 8px; }
+  .icon-btn { width: 36px; height: 36px; border-radius: 50%; border: none; background: var(--gray-100); display: flex; align-items: center; justify-content: center; cursor: pointer; font-size: 18px; color: var(--gray-600); transition: background 0.15s; }
+  .icon-btn:active { background: var(--gray-200); transform: scale(0.95); }
+  .icon-btn.primary { background: var(--teal); color: #fff; }
+  .icon-btn.primary:active { background: var(--teal-dark); }
+
+  /* ── Content ── */
+  .content { flex: 1; overflow-y: auto; -webkit-overflow-scrolling: touch; padding: 16px; }
+  .content::-webkit-scrollbar { display: none; }
+
+  /* ── Tab bar ── */
+  .tabbar { display: flex; border-top: 1px solid var(--gray-100); background: #fff; flex-shrink: 0; padding-bottom: env(safe-area-inset-bottom); }
+  .tab { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 10px 4px 8px; gap: 3px; cursor: pointer; border: none; background: none; font-size: 10px; color: var(--gray-400); font-family: var(--font); transition: color 0.15s; }
+  .tab i { font-size: 22px; }
+  .tab.active { color: var(--teal); }
+  .tab.active i { font-weight: bold; }
+
+  /* ── Cards ── */
+  .card { background: #fff; border: 1px solid var(--gray-100); border-radius: var(--radius-lg); padding: 14px 16px; margin-bottom: 10px; box-shadow: var(--shadow-sm); }
+  .card-tap { cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; }
+  .card-tap:active { transform: scale(0.985); box-shadow: none; }
+
+  /* ── Metrics ── */
+  .metrics-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 16px; }
+  .metric { background: var(--gray-50); border-radius: var(--radius-md); padding: 14px; }
+  .metric-label { font-size: 11px; color: var(--gray-400); margin-bottom: 4px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.4px; }
+  .metric-value { font-size: 22px; font-weight: 700; letter-spacing: -0.5px; }
+  .metric-value.green { color: var(--teal); }
+  .metric-value.red { color: var(--red); }
+  .metric-value.blue { color: var(--blue); }
+
+  /* ── Section title ── */
+  .section-title { font-size: 12px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 10px; margin-top: 4px; }
+
+  /* ── Patient list ── */
+  .patient-row { display: flex; align-items: center; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--gray-100); cursor: pointer; }
+  .patient-row:last-child { border-bottom: none; }
+  .avatar { width: 42px; height: 42px; border-radius: 50%; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 13px; color: var(--teal-dark); flex-shrink: 0; }
+  .patient-info { flex: 1; min-width: 0; }
+  .patient-name { font-size: 15px; font-weight: 600; color: var(--gray-900); }
+  .patient-sub { font-size: 12px; color: var(--gray-400); margin-top: 1px; }
+  .badge { display: inline-block; padding: 2px 8px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .badge-green { background: var(--teal-light); color: var(--teal-dark); }
+  .badge-red { background: var(--red-light); color: var(--red); }
+  .badge-blue { background: var(--blue-light); color: var(--blue); }
+  .badge-amber { background: var(--amber-light); color: var(--amber); }
+
+  /* ── Session items ── */
+  .session-card { background: #fff; border: 1px solid var(--gray-100); border-radius: var(--radius-md); padding: 12px 14px; margin-bottom: 8px; }
+  .session-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 6px; }
+  .session-patient { font-size: 14px; font-weight: 600; }
+  .session-date { font-size: 12px; color: var(--gray-400); }
+  .session-amounts { display: flex; gap: 10px; font-size: 12px; margin-bottom: 6px; flex-wrap: wrap; }
+  .amount-ok { color: var(--teal); font-weight: 600; }
+  .amount-pend { color: var(--red); font-weight: 600; }
+  .amount-gray { color: var(--gray-400); }
+  .session-notes { font-size: 13px; color: var(--gray-600); line-height: 1.5; padding-top: 6px; border-top: 1px solid var(--gray-100); }
+  .session-action { display: flex; align-items: flex-start; gap: 5px; font-size: 12px; color: var(--blue); margin-top: 6px; }
+
+  /* ── Search ── */
+  .search-wrap { position: relative; margin-bottom: 14px; }
+  .search-input { width: 100%; padding: 11px 14px 11px 38px; font-size: 15px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); background: var(--gray-50); color: var(--gray-900); font-family: var(--font); outline: none; }
+  .search-input:focus { border-color: var(--teal); background: #fff; }
+  .search-icon { position: absolute; left: 11px; top: 50%; transform: translateY(-50%); font-size: 18px; color: var(--gray-400); pointer-events: none; }
+  .highlight { background: #FEF08A; border-radius: 2px; padding: 0 1px; }
+
+  /* ── Action items ── */
+  .action-card { border-left: 3px solid var(--teal); border-radius: 0 var(--radius-md) var(--radius-md) 0; background: #fff; border-top: 1px solid var(--gray-100); border-right: 1px solid var(--gray-100); border-bottom: 1px solid var(--gray-100); padding: 12px 14px; margin-bottom: 8px; }
+  .action-who { font-size: 13px; font-weight: 600; color: var(--gray-900); margin-bottom: 3px; }
+  .action-text { font-size: 13px; color: var(--gray-600); line-height: 1.45; }
+  .action-when { font-size: 11px; color: var(--gray-400); margin-top: 5px; }
+
+  /* ── Chart ── */
+  .chart-wrap { background: var(--gray-50); border-radius: var(--radius-md); padding: 14px; margin-bottom: 16px; }
+  .chart-bars { display: flex; align-items: flex-end; gap: 6px; height: 80px; margin-bottom: 6px; }
+  .bar-group { display: flex; flex-direction: column; align-items: center; gap: 3px; flex: 1; }
+  .bar { width: 100%; border-radius: 4px 4px 0 0; }
+  .bar-label { font-size: 10px; color: var(--gray-400); font-weight: 500; }
+  .chart-legend { display: flex; gap: 12px; font-size: 11px; color: var(--gray-400); }
+  .leg-dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; margin-right: 4px; vertical-align: middle; }
+
+  /* ── Ficha ── */
+  .back-btn { display: flex; align-items: center; gap: 6px; font-size: 15px; color: var(--teal); font-weight: 600; background: none; border: none; padding: 0 0 14px; cursor: pointer; font-family: var(--font); }
+  .ficha-header { display: flex; align-items: center; gap: 14px; margin-bottom: 16px; }
+  .ficha-avatar { width: 56px; height: 56px; border-radius: 50%; background: var(--teal-light); display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 18px; color: var(--teal-dark); flex-shrink: 0; }
+  .ficha-name { font-size: 20px; font-weight: 700; letter-spacing: -0.3px; }
+  .ficha-meta { font-size: 13px; color: var(--gray-400); margin-top: 2px; }
+  .stats-row { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; margin-bottom: 14px; }
+  .stat-box { background: var(--gray-50); border-radius: var(--radius-sm); padding: 10px 8px; text-align: center; }
+  .stat-val { font-size: 16px; font-weight: 700; color: var(--gray-900); }
+  .stat-val.green { color: var(--teal); }
+  .stat-val.red { color: var(--red); }
+  .stat-lbl { font-size: 10px; color: var(--gray-400); margin-top: 2px; font-weight: 500; }
+  .notas-label { font-size: 13px; font-weight: 600; color: var(--gray-600); margin-bottom: 6px; }
+  textarea { width: 100%; padding: 10px 12px; font-size: 14px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); background: var(--gray-50); color: var(--gray-900); font-family: var(--font); resize: none; line-height: 1.5; outline: none; }
+  textarea:focus { border-color: var(--teal); background: #fff; }
+  .save-btn { width: 100%; padding: 13px; background: var(--teal); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; font-family: var(--font); cursor: pointer; margin-top: 8px; transition: background 0.15s; }
+  .save-btn:active { background: var(--teal-dark); transform: scale(0.99); }
+  .save-ok { text-align: center; font-size: 13px; color: var(--teal); margin-top: 6px; font-weight: 500; display: none; }
+
+  /* ── Modal ── */
+  .modal-bg { position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 100; display: flex; align-items: flex-end; }
+  .modal { background: #fff; border-radius: var(--radius-xl) var(--radius-xl) 0 0; padding: 20px 20px calc(20px + env(safe-area-inset-bottom)); width: 100%; max-height: 90dvh; overflow-y: auto; }
+  .modal-handle { width: 36px; height: 4px; background: var(--gray-200); border-radius: 2px; margin: 0 auto 16px; }
+  .modal h2 { font-size: 18px; font-weight: 700; margin-bottom: 16px; }
+  .form-group { margin-bottom: 12px; }
+  .form-group label { font-size: 12px; font-weight: 600; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.4px; display: block; margin-bottom: 5px; }
+  .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 11px 13px; font-size: 15px; border: 1.5px solid var(--gray-200); border-radius: var(--radius-md); background: var(--gray-50); color: var(--gray-900); font-family: var(--font); outline: none; }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: var(--teal); background: #fff; }
+  .form-row-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .modal-actions { display: flex; gap: 10px; margin-top: 16px; }
+  .btn-cancel { flex: 1; padding: 13px; background: var(--gray-100); color: var(--gray-600); border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; font-family: var(--font); cursor: pointer; }
+  .btn-save { flex: 2; padding: 13px; background: var(--teal); color: #fff; border: none; border-radius: var(--radius-md); font-size: 15px; font-weight: 600; font-family: var(--font); cursor: pointer; }
+  .btn-save:active { background: var(--teal-dark); }
+
+  /* ── Empty state ── */
+  .empty { text-align: center; padding: 40px 20px; color: var(--gray-400); }
+  .empty i { font-size: 40px; margin-bottom: 10px; display: block; }
+  .empty p { font-size: 14px; }
+
+  /* ── Toast ── */
+  .toast { position: fixed; top: 60px; left: 50%; transform: translateX(-50%) translateY(-80px); background: var(--gray-900); color: #fff; padding: 10px 18px; border-radius: 20px; font-size: 13px; font-weight: 500; z-index: 200; transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); pointer-events: none; white-space: nowrap; }
+  .toast.show { transform: translateX(-50%) translateY(0); }
+
+  /* ── Import fab ── */
+  .fab { position: fixed; bottom: calc(72px + env(safe-area-inset-bottom)); right: 20px; width: 52px; height: 52px; border-radius: 50%; background: var(--teal); color: #fff; border: none; font-size: 24px; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 14px rgba(29,158,117,0.4); cursor: pointer; z-index: 50; transition: transform 0.15s; }
+  .fab:active { transform: scale(0.92); }
+</style>
+</head>
+<body>
+<div id="app">
+  <div class="header">
+    <div class="header-row">
+      <div>
+        <h1 id="header-title">Consultorio</h1>
+        <p id="header-sub">Psicología Clínica</p>
+      </div>
+      <div class="header-actions">
+        <button class="icon-btn" id="export-btn" onclick="exportData()" title="Exportar datos">
+          <i class="ti ti-download"></i>
+        </button>
+        <button class="icon-btn primary" id="add-btn" onclick="openModal()" title="Nueva sesión">
+          <i class="ti ti-plus"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div class="content" id="content"></div>
+
+  <nav class="tabbar">
+    <button class="tab active" id="tab-dashboard" onclick="goTo('dashboard')">
+      <i class="ti ti-layout-dashboard"></i>
+      <span>Inicio</span>
+    </button>
+    <button class="tab" id="tab-pacientes" onclick="goTo('pacientes')">
+      <i class="ti ti-users"></i>
+      <span>Pacientes</span>
+    </button>
+    <button class="tab" id="tab-sesiones" onclick="goTo('sesiones')">
+      <i class="ti ti-notes"></i>
+      <span>Sesiones</span>
+    </button>
+    <button class="tab" id="tab-buscar" onclick="goTo('buscar')">
+      <i class="ti ti-search"></i>
+      <span>Buscar</span>
+    </button>
+    <button class="tab" id="tab-acciones" onclick="goTo('acciones')">
+      <i class="ti ti-checkbox"></i>
+      <span>Acciones</span>
+    </button>
+  </nav>
+</div>
+
+<div id="modal-container"></div>
+<div class="toast" id="toast"></div>
+
+<script>
+const MONTHS = ['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const STORAGE_KEY = 'consultorio_v1';
+
+const SEED = [
+  {id:'7925ca41',fecha:'2026-01-02',mes:1,anio:2026,paciente:'Federico Santini',facturado:40000,cobrado:40000,formaPago:'Efectivo',notas:'Rencuentro con una compañera. Que hacer? No lastimar al otro. Aparece Quiara',accion:''},
+  {id:'39d3713e',fecha:'2026-01-02',mes:1,anio:2026,paciente:'Pedro Muro',facturado:30000,cobrado:30000,formaPago:'Transferencia MP',notas:'Cierre de año. Post mision. "Ser firme y claro". No perder de lado la flexibilidad',accion:''},
+  {id:'7e82ea55',fecha:'2026-01-03',mes:1,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:43000,formaPago:'Transferencia MP',notas:'Elecciones, que hacer? Quien quiero ser? Corte con Camila? Muy sensible, siente todo',accion:''},
+  {id:'6368597c',fecha:'2026-01-04',mes:1,anio:2026,paciente:'Matias Chorbagian',facturado:45000,cobrado:45000,formaPago:'Transferencia MP',notas:'Año nuevo para que el espacio terapeutico? Sueños Nikita, familia en el supermercado',accion:''},
+  {id:'da15dfdc',fecha:'2026-01-09',mes:1,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:43000,formaPago:'Transferencia MP',notas:'Corto con Cami. Su vinculo con las mujeres. Interrupcion de embarazo',accion:''},
+  {id:'b2632e3a',fecha:'2026-01-10',mes:1,anio:2026,paciente:'Federico Santini',facturado:40000,cobrado:40000,formaPago:'Efectivo',notas:'Seguir? Cambiar? Ser otro',accion:''},
+  {id:'895c0337',fecha:'2026-02-05',mes:2,anio:2026,paciente:'Federico Santini',facturado:45000,cobrado:45000,formaPago:'Transferencia banco',notas:'Controlar todo. Salir o no salir. Elecciones',accion:''},
+  {id:'867673c0',fecha:'2026-02-06',mes:2,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:0,formaPago:'Transferencia MP',notas:'Cierre con Cami.',accion:''},
+  {id:'ff551545',fecha:'2026-02-21',mes:2,anio:2026,paciente:'Nacho Alemann',facturado:45000,cobrado:0,formaPago:'Transferencia banco',notas:'Primera sesion. Dejar de hacer cirugias, dedicarse a la clinica. Pensamientos intrusivos. Vinculos familiares.',accion:''},
+  {id:'d5a8dbda',fecha:'2026-02-27',mes:2,anio:2026,paciente:'Pedro Muro',facturado:40000,cobrado:40000,formaPago:'Transferencia banco',notas:'Vuelta de viaje. Decisiones profesionales',accion:''},
+  {id:'10e6fe9a',fecha:'2026-02-28',mes:2,anio:2026,paciente:'Nacho Alemann',facturado:45000,cobrado:90000,formaPago:'Transferencia banco',notas:'Diabetes. Charla sobre dejar la cirugia con sus papas. Que medico quiero ser?',accion:''},
+  {id:'93be61ca',fecha:'2026-02-28',mes:2,anio:2026,paciente:'Dante Milone',facturado:40000,cobrado:40000,formaPago:'Transferencia banco',notas:'Sigue de novio. Sexualidad una incognita. Sentirse solo en el verano.',accion:''},
+  {id:'3501cd85',fecha:'2026-03-08',mes:3,anio:2026,paciente:'Pedro Muro',facturado:40000,cobrado:40000,formaPago:'Transferencia MP',notas:'Aprendizajes viaje: Firmeza. Conocer el mundo. Hobbies, deportes',accion:''},
+  {id:'bcd9f2de',fecha:'2026-03-16',mes:3,anio:2026,paciente:'Juampi Zandrino',facturado:40000,cobrado:40000,formaPago:'Efectivo',notas:'Muy bien. Trabajando. Vinculo con la novia, animarse a expresar lo que siente.',accion:''},
+  {id:'3bb8ef0e',fecha:'2026-03-18',mes:3,anio:2026,paciente:'Marcos Bullrich',facturado:45000,cobrado:0,formaPago:'Transferencia banco',notas:'Vuelta del viaje. Encontrar silencio del alma. Futuro, vocacional. Relacion con el padre',accion:''},
+  {id:'7efa7ac9',fecha:'2026-03-18',mes:3,anio:2026,paciente:'Nico Alderede',facturado:45000,cobrado:45000,formaPago:'Transferencia banco',notas:'Situacion vinculo toxico con la novia. No priorizarse',accion:''},
+  {id:'5ec25cb0',fecha:'2026-03-24',mes:3,anio:2026,paciente:'Pedro Muro',facturado:40000,cobrado:40000,formaPago:'Transferencia banco',notas:'Sexualidad eleccion, aceptacion para el cambio.',accion:''},
+  {id:'7894d76c',fecha:'2026-03-25',mes:3,anio:2026,paciente:'Marcos Bullrich',facturado:45000,cobrado:90000,formaPago:'Transferencia banco',notas:'Vinculo con sus hermanos. Hacia donde ir con la terapia. Actividad valores',accion:''},
+  {id:'c3c167c0',fecha:'2026-03-30',mes:3,anio:2026,paciente:'Pedro Muro',facturado:40000,cobrado:40000,formaPago:'Transferencia banco',notas:'Definiciones laborales. Arrancar cada 15 dias',accion:''},
+  {id:'a352313f',fecha:'2026-04-09',mes:4,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:43000,formaPago:'Transferencia MP',notas:'Ausencia',accion:''},
+  {id:'955fa2eb',fecha:'2026-04-16',mes:4,anio:2026,paciente:'Nacho Alemann',facturado:45000,cobrado:90000,formaPago:'Transferencia banco',notas:'Seguir profundizando en el para que operar',accion:''},
+  {id:'679bdc10',fecha:'2026-04-17',mes:4,anio:2026,paciente:'Federico Santini',facturado:45000,cobrado:45000,formaPago:'Efectivo',notas:'No sentirse. Hubo un movimiento al final de la sesion',accion:''},
+  {id:'ecd78f61',fecha:'2026-04-18',mes:4,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:43000,formaPago:'Transferencia MP',notas:'Equilibrio. Comprometerse. Mi casa independencia',accion:''},
+  {id:'181f4a7b',fecha:'2026-04-18',mes:4,anio:2026,paciente:'Marcos Bullrich',facturado:45000,cobrado:0,formaPago:'Transferencia MP',notas:'Vocacion. Mujeres. Trabajo. Quien soy, quien quiero ser',accion:''},
+  {id:'58da0efd',fecha:'2026-04-22',mes:4,anio:2026,paciente:'Pedro Muro',facturado:40000,cobrado:40000,formaPago:'Transferencia MP',notas:'Futuro incierto. Charla sexualidad con sus padres. Empezó yoga',accion:''},
+  {id:'abf1cac7',fecha:'2026-04-30',mes:4,anio:2026,paciente:'Federico Santini',facturado:45000,cobrado:45000,formaPago:'Efectivo',notas:'Amor propio vs egoísmo. Dar todo en relaciones que no prosperan.',accion:''},
+  {id:'58b6043d',fecha:'2026-04-30',mes:4,anio:2026,paciente:'Marcos Bullrich',facturado:45000,cobrado:90000,formaPago:'Transferencia MP',notas:'Frustracion con el rugby. Elecciones, work and travel. Lista de prioridades',accion:''},
+  {id:'242966b6',fecha:'2026-04-30',mes:4,anio:2026,paciente:'Nacho Gatti',facturado:43000,cobrado:43000,formaPago:'Transferencia MP',notas:'Vuelta con Cami. Querer estar en Pareja? Ternura como sentimiento de amor.',accion:''},
+  {id:'6f6ed815',fecha:'2026-05-07',mes:5,anio:2026,paciente:'Pedro Muro',facturado:45000,cobrado:45000,formaPago:'Transferencia MP',notas:'Vulnerabilidad. Logra expresar lo que siente. Buscar mayor vocabulario',accion:''},
+  {id:'8b8ca37a',fecha:'2026-05-08',mes:5,anio:2026,paciente:'Juampi Zandrino',facturado:45000,cobrado:45000,formaPago:'Transferencia MP',notas:'Esta todo bien. Redefinir objetivos terapeuticos o dar una pausa.',accion:''},
+  {id:'6de85b39',fecha:'2026-05-08',mes:5,anio:2026,paciente:'Nacho Gatti',facturado:50000,cobrado:50000,formaPago:'Transferencia MP',notas:'Habitar la ansiedad. No me siento seguro, no se quien soy. El amor como pilar fundamental.',accion:'Intentar ir al gym uno o dos veces por semana por la mañana.'},
+  {id:'57158e3d',fecha:'2026-05-10',mes:5,anio:2026,paciente:'Nico Alderede',facturado:45000,cobrado:45000,formaPago:'Transferencia MP',notas:'Vinculo con la novia. Aceptar los sentimientos de ella.',accion:''},
+  {id:'6b91084e',fecha:'2026-05-10',mes:5,anio:2026,paciente:'Marcos Bullrich',facturado:50000,cobrado:0,formaPago:'Transferencia MP',notas:'W and T. Vinculo con sus hermanos. Crecer en calidad y cantidad.',accion:''},
+  {id:'94d80343',fecha:'2026-05-21',mes:5,anio:2026,paciente:'Pedro Muro',facturado:45000,cobrado:0,formaPago:'Transferencia banco',notas:'Estructura vs flexibilidad. Buscar que Pedro quiero ser en mi vida.',accion:''},
+  {id:'2570e1d9',fecha:'2026-05-21',mes:5,anio:2026,paciente:'Nacho Gatti',facturado:50000,cobrado:50000,formaPago:'Transferencia MP',notas:'Irritabilidad. Muy comodo, encerrado. Pelea con los padres.',accion:'Intentar ir al gym uno o dos veces por semana por la mañana.'},
+  {id:'a178b0cb',fecha:'2026-05-22',mes:5,anio:2026,paciente:'Marcos Bullrich',facturado:50000,cobrado:50000,formaPago:'Transferencia MP',notas:'Falta de motivacion. Como se siente con el mismo. Salir con Martina.',accion:''},
+];
+
+// ── State ──
+let S = loadState();
+let view = 'dashboard';
+let fichaOpen = null;
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (raw) return JSON.parse(raw);
+  } catch(e) {}
+  const pacientes = {};
+  const names = [...new Set(SEED.map(s=>s.paciente))];
+  names.forEach(n => {
+    const subs = SEED.filter(s=>s.paciente===n);
+    pacientes[n] = { nombre:n, notas:'', honorario: subs.slice(-1)[0].facturado };
+  });
+  return { sesiones: [...SEED], pacientes };
+}
+
+function saveState() {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(S)); } catch(e) {}
+}
+
+// ── Helpers ──
+function fmt(n) { return Math.round(n).toLocaleString('es-AR'); }
+function initials(name) { return name.split(' ').slice(0,2).map(w=>w[0]).join('').toUpperCase(); }
+function deudaPaciente(nombre) {
+  return S.sesiones.filter(s=>s.paciente===nombre).reduce((a,s)=>a+(s.facturado-s.cobrado),0);
+}
+
+function toast(msg) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  setTimeout(()=>el.classList.remove('show'), 2400);
+}
+
+// ── Navigation ──
+function goTo(v) {
+  view = v;
+  fichaOpen = null;
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('tab-'+v).classList.add('active');
+  const titles = {dashboard:'Consultorio',pacientes:'Pacientes',sesiones:'Sesiones',buscar:'Buscar',acciones:'Acciones'};
+  document.getElementById('header-title').textContent = titles[v];
+  render();
+}
+
+function render() {
+  const el = document.getElementById('content');
+  if (view==='dashboard') el.innerHTML = renderDashboard();
+  else if (view==='pacientes') { if (fichaOpen) el.innerHTML = renderFicha(fichaOpen); else el.innerHTML = renderPacientes(); }
+  else if (view==='sesiones') el.innerHTML = renderSesiones();
+  else if (view==='buscar') el.innerHTML = renderBuscar();
+  else if (view==='acciones') el.innerHTML = renderAcciones();
+}
+
+// ── Dashboard ──
+function renderDashboard() {
+  const totalF = S.sesiones.reduce((a,s)=>a+s.facturado,0);
+  const totalC = S.sesiones.reduce((a,s)=>a+s.cobrado,0);
+  const totalD = totalF - totalC;
+  const nPac = Object.keys(S.pacientes).length;
+
+  // chart last 5 months
+  const byM = {};
+  S.sesiones.forEach(s=>{
+    const k = s.anio+'-'+String(s.mes).padStart(2,'0');
+    if(!byM[k]) byM[k]={f:0,c:0,lbl:MONTHS[s.mes-1]};
+    byM[k].f+=s.facturado; byM[k].c+=s.cobrado;
+  });
+  const months = Object.values(byM).slice(-5);
+  const maxV = Math.max(...months.map(m=>m.f),1);
+  const bars = months.map(m=>{
+    const hf = Math.round((m.f/maxV)*74);
+    const hc = Math.round((m.c/maxV)*74);
+    return `<div class="bar-group">
+      <div style="display:flex;gap:3px;align-items:flex-end;height:74px">
+        <div class="bar" style="height:${hf}px;width:13px;background:var(--teal-mid)"></div>
+        <div class="bar" style="height:${hc}px;width:13px;background:var(--teal)"></div>
+      </div>
+      <div class="bar-label">${m.lbl}</div>
+    </div>`;
+  }).join('');
+
+  // recent 4
+  const recent = [...S.sesiones].sort((a,b)=>b.fecha.localeCompare(a.fecha)).slice(0,4);
+  const recHtml = recent.map(s=>{
+    const d = s.facturado - s.cobrado;
+    return `<div class="session-card">
+      <div class="session-top">
+        <span class="session-patient">${s.paciente}</span>
+        <span class="session-date">${s.fecha}</span>
+      </div>
+      <div class="session-amounts">
+        <span class="amount-gray">$${fmt(s.facturado)}</span>
+        <span class="amount-ok">cobr $${fmt(s.cobrado)}</span>
+        ${d>0?`<span class="amount-pend">debe $${fmt(d)}</span>`:''}
+      </div>
+      ${s.notas?`<div class="session-notes">${s.notas.substring(0,90)}${s.notas.length>90?'…':''}</div>`:''}
+    </div>`;
+  }).join('');
+
+  return `
+    <div class="metrics-grid">
+      <div class="metric"><div class="metric-label">Pacientes</div><div class="metric-value blue">${nPac}</div></div>
+      <div class="metric"><div class="metric-label">Sesiones</div><div class="metric-value">${S.sesiones.length}</div></div>
+      <div class="metric"><div class="metric-label">Cobrado</div><div class="metric-value green">$${fmt(totalC/1000)}k</div></div>
+      <div class="metric"><div class="metric-label">Deuda</div><div class="metric-value ${totalD>0?'red':'green'}">$${fmt(totalD/1000)}k</div></div>
+    </div>
+    <div class="chart-wrap">
+      <div class="section-title" style="margin-bottom:10px">Ingresos por mes</div>
+      <div class="chart-bars">${bars}</div>
+      <div class="chart-legend">
+        <span><span class="leg-dot" style="background:var(--teal-mid)"></span>Facturado</span>
+        <span><span class="leg-dot" style="background:var(--teal)"></span>Cobrado</span>
+      </div>
+    </div>
+    <div class="section-title">Últimas sesiones</div>
+    ${recHtml}
+  `;
+}
+
+// ── Pacientes ──
+function renderPacientes() {
+  const list = Object.values(S.pacientes).sort((a,b)=>a.nombre.localeCompare(b.nombre));
+  const rows = list.map(p=>{
+    const d = deudaPaciente(p.nombre);
+    const nsess = S.sesiones.filter(s=>s.paciente===p.nombre).length;
+    return `<div class="patient-row card-tap" onclick="openFicha('${p.nombre.replace(/'/g,"\\'")}')">
+      <div class="avatar">${initials(p.nombre)}</div>
+      <div class="patient-info">
+        <div class="patient-name">${p.nombre}</div>
+        <div class="patient-sub">${nsess} sesiones · $${fmt(p.honorario)}/ses</div>
+      </div>
+      <span class="badge ${d>0?'badge-red':'badge-green'}">${d>0?'$'+fmt(d):'Al día'}</span>
+    </div>`;
+  }).join('');
+  return `<div class="card">${rows}</div>`;
+}
+
+function openFicha(nombre) {
+  fichaOpen = nombre;
+  render();
+  document.getElementById('content').scrollTop = 0;
+}
+
+function renderFicha(nombre) {
+  const p = S.pacientes[nombre];
+  const sessions = S.sesiones.filter(s=>s.paciente===nombre).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  const totalF = sessions.reduce((a,s)=>a+s.facturado,0);
+  const totalC = sessions.reduce((a,s)=>a+s.cobrado,0);
+  const deuda = totalF - totalC;
+
+  const sesHtml = sessions.map(s=>{
+    const d = s.facturado - s.cobrado;
+    return `<div class="session-card">
+      <div class="session-top">
+        <span class="session-date" style="font-weight:600;color:var(--gray-900)">${s.fecha}</span>
+        <span class="badge ${d>0?'badge-red':'badge-green'}">${d>0?'Pendiente':'Pagado'}</span>
+      </div>
+      <div class="session-amounts">
+        <span class="amount-gray">$${fmt(s.facturado)}</span>
+        <span class="amount-ok">cobr $${fmt(s.cobrado)}</span>
+        <span class="amount-gray">${s.formaPago}</span>
+      </div>
+      ${s.notas?`<div class="session-notes">${s.notas}</div>`:''}
+      ${s.accion?`<div class="session-action"><i class="ti ti-arrow-right"></i>${s.accion}</div>`:''}
+    </div>`;
+  }).join('');
+
+  return `
+    <button class="back-btn" onclick="fichaOpen=null;render()">
+      <i class="ti ti-chevron-left"></i> Pacientes
+    </button>
+    <div class="ficha-header">
+      <div class="ficha-avatar">${initials(nombre)}</div>
+      <div>
+        <div class="ficha-name">${nombre}</div>
+        <div class="ficha-meta">${sessions.length} sesiones · $${fmt(p.honorario)}/ses</div>
+      </div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-box"><div class="stat-val">${sessions.length}</div><div class="stat-lbl">Sesiones</div></div>
+      <div class="stat-box"><div class="stat-val green">$${fmt(totalC/1000)}k</div><div class="stat-lbl">Cobrado</div></div>
+      <div class="stat-box"><div class="stat-val ${deuda>0?'red':'green'}">${deuda>0?'$'+fmt(deuda/1000)+'k':'✓'}</div><div class="stat-lbl">Deuda</div></div>
+    </div>
+    <div class="card" style="margin-bottom:16px">
+      <div class="notas-label">Notas clínicas</div>
+      <textarea id="notas-field" rows="4" placeholder="Diagnóstico, observaciones, hipótesis...">${p.notas||''}</textarea>
+      <button class="save-btn" onclick="saveNotas('${nombre.replace(/'/g,"\\'")}')">Guardar notas</button>
+      <div class="save-ok" id="save-ok">✓ Guardado</div>
+    </div>
+    <div class="section-title">Historial</div>
+    ${sesHtml}
+  `;
+}
+
+function saveNotas(nombre) {
+  S.pacientes[nombre].notas = document.getElementById('notas-field').value;
+  saveState();
+  const ok = document.getElementById('save-ok');
+  ok.style.display = 'block';
+  setTimeout(()=>ok.style.display='none', 2000);
+  toast('Notas guardadas');
+}
+
+// ── Sesiones ──
+function renderSesiones() {
+  const sorted = [...S.sesiones].sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  return sorted.map(s=>{
+    const d = s.facturado - s.cobrado;
+    return `<div class="session-card">
+      <div class="session-top">
+        <span class="session-patient">${s.paciente}</span>
+        <div style="display:flex;align-items:center;gap:6px">
+          <span class="badge ${d>0?'badge-red':'badge-green'}">${d>0?'Pendiente':'Pagado'}</span>
+          <span class="session-date">${s.fecha}</span>
+        </div>
+      </div>
+      <div class="session-amounts">
+        <span class="amount-gray">$${fmt(s.facturado)}</span>
+        <span class="amount-ok">cobr $${fmt(s.cobrado)}</span>
+        ${d>0?`<span class="amount-pend">debe $${fmt(d)}</span>`:''}
+        <span class="amount-gray">${s.formaPago}</span>
+      </div>
+      ${s.notas?`<div class="session-notes">${s.notas}</div>`:''}
+      ${s.accion?`<div class="session-action"><i class="ti ti-arrow-right"></i>${s.accion}</div>`:''}
+    </div>`;
+  }).join('');
+}
+
+// ── Buscar ──
+function renderBuscar() {
+  return `
+    <div class="search-wrap">
+      <i class="ti ti-search search-icon"></i>
+      <input class="search-input" type="search" id="q" placeholder="Buscar en notas..." oninput="doSearch()" autocomplete="off">
+    </div>
+    <div id="results"><div class="empty"><i class="ti ti-search"></i><p>Escribí para buscar en todas las notas</p></div></div>
+  `;
+}
+
+function doSearch() {
+  const q = document.getElementById('q').value.trim().toLowerCase();
+  const el = document.getElementById('results');
+  if(q.length < 2) { el.innerHTML = '<div class="empty"><i class="ti ti-search"></i><p>Escribí al menos 2 caracteres</p></div>'; return; }
+  const re = new RegExp(q.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'),'gi');
+  const hits = S.sesiones.filter(s=>(s.notas&&s.notas.toLowerCase().includes(q))||(s.accion&&s.accion.toLowerCase().includes(q))||s.paciente.toLowerCase().includes(q));
+  if(!hits.length) { el.innerHTML = '<div class="empty"><i class="ti ti-mood-empty"></i><p>Sin resultados</p></div>'; return; }
+  const hi = t => t.replace(re, m=>`<span class="highlight">${m}</span>`);
+  el.innerHTML = `<div class="section-title">${hits.length} resultado${hits.length!==1?'s':''}</div>` +
+    hits.map(s=>`<div class="session-card">
+      <div class="session-top"><span class="session-patient">${s.paciente}</span><span class="session-date">${s.fecha}</span></div>
+      ${s.notas?`<div class="session-notes">${hi(s.notas)}</div>`:''}
+      ${s.accion?`<div class="session-action"><i class="ti ti-arrow-right"></i>${hi(s.accion)}</div>`:''}
+    </div>`).join('');
+}
+
+// ── Acciones ──
+function renderAcciones() {
+  const list = S.sesiones.filter(s=>s.accion&&s.accion.trim()).sort((a,b)=>b.fecha.localeCompare(a.fecha));
+  if(!list.length) return '<div class="empty"><i class="ti ti-checkbox"></i><p>No hay acciones registradas</p></div>';
+  return `<div class="section-title">${list.length} acción${list.length!==1?'es':''}</div>` +
+    list.map(s=>`<div class="action-card">
+      <div class="action-who">${s.paciente}</div>
+      <div class="action-text">${s.accion}</div>
+      <div class="action-when">${s.fecha}</div>
+    </div>`).join('');
+}
+
+// ── Modal nueva sesión ──
+function openModal() {
+  const opts = Object.keys(S.pacientes).sort().map(p=>`<option>${p}</option>`).join('');
+  const today = new Date().toISOString().split('T')[0];
+  document.getElementById('modal-container').innerHTML = `
+    <div class="modal-bg" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <div class="modal-handle"></div>
+        <h2>Nueva sesión</h2>
+        <div class="form-group"><label>Paciente</label>
+          <select id="f-pac"><option value="">Seleccionar...</option>${opts}</select>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>Fecha</label><input type="date" id="f-fecha" value="${today}"></div>
+          <div class="form-group"><label>Forma de pago</label>
+            <select id="f-pago"><option>Efectivo</option><option>Transferencia MP</option><option>Transferencia banco</option></select>
+          </div>
+        </div>
+        <div class="form-row-2">
+          <div class="form-group"><label>Facturado ($)</label><input type="number" id="f-fact" placeholder="45000" inputmode="numeric"></div>
+          <div class="form-group"><label>Cobrado ($)</label><input type="number" id="f-cobr" placeholder="45000" inputmode="numeric"></div>
+        </div>
+        <div class="form-group"><label>Notas de sesión</label>
+          <textarea id="f-notas" rows="3" placeholder="Temas trabajados, observaciones..."></textarea>
+        </div>
+        <div class="form-group"><label>Acción comprometida</label>
+          <input type="text" id="f-accion" placeholder="Ej: Llevar registro de sueños">
+        </div>
+        <div class="modal-actions">
+          <button class="btn-cancel" onclick="closeModal()">Cancelar</button>
+          <button class="btn-save" onclick="guardarSesion()">Guardar</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function closeModal() { document.getElementById('modal-container').innerHTML=''; }
+
+function guardarSesion() {
+  const pac = document.getElementById('f-pac').value;
+  const fecha = document.getElementById('f-fecha').value;
+  if(!pac||!fecha) { toast('Completá paciente y fecha'); return; }
+  const fact = parseFloat(document.getElementById('f-fact').value)||0;
+  const cobr = parseFloat(document.getElementById('f-cobr').value)||0;
+  const notas = document.getElementById('f-notas').value;
+  const accion = document.getElementById('f-accion').value;
+  const pago = document.getElementById('f-pago').value;
+  const d = new Date(fecha);
+  S.sesiones.push({ id:Math.random().toString(36).slice(2,10), fecha, mes:d.getMonth()+1, anio:d.getFullYear(), paciente:pac, facturado:fact, cobrado:cobr, formaPago:pago, notas, accion });
+  if(S.pacientes[pac]) S.pacientes[pac].honorario = fact||S.pacientes[pac].honorario;
+  saveState();
+  closeModal();
+  toast('Sesión guardada ✓');
+  render();
+}
+
+// ── Export ──
+function exportData() {
+  const json = JSON.stringify(S, null, 2);
+  const blob = new Blob([json], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'consultorio_backup_' + new Date().toISOString().split('T')[0] + '.json';
+  a.click();
+  toast('Backup descargado');
+}
+
+// ── Init ──
+render();
+</script>
+</body>
+</html>
